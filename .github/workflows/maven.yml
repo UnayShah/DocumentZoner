@@ -22,6 +22,6 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Test with Maven
-      run: mvn -B test --file pom.xml
+      run: mvn -B test --file ./documentzoner/pom.xml
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file ./documentzoner/pom.xml
