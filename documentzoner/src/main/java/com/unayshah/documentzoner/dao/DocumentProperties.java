@@ -1,46 +1,53 @@
 package com.unayshah.documentzoner.dao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.web.multipart.MultipartFile;
 
+@org.springframework.data.mongodb.core.mapping.Document(collection = "DocumentProperties")
 public class DocumentProperties {
     @Id
-    private UUID id;
+    private String id;
     private Document document;
     private List<Zone> zones;
 
-    public DocumentProperties(String pathname) throws FileNotFoundException {
-        this(pathname, new ArrayList<>());
-    }
-
-    public DocumentProperties(File document) throws FileNotFoundException {
+    public DocumentProperties(MultipartFile document) throws IOException {
         this(document, new ArrayList<>());
     }
 
-    public DocumentProperties(Document document) throws FileNotFoundException {
-        this(document, new ArrayList<>());
-    }
-    
-    public DocumentProperties(String pathname, List<Zone> zones) throws FileNotFoundException {
-        this(new Document(pathname), zones);
+    public DocumentProperties(String documentName, MultipartFile document) throws IOException {
+        this(documentName, document, new ArrayList<>());
     }
 
-    public DocumentProperties(File document, List<Zone> zones) throws FileNotFoundException {
+    public DocumentProperties(Document document) throws IOException {
+        this(document, new ArrayList<>());
+    }
+
+    public DocumentProperties(MultipartFile document, List<Zone> zones) throws IOException {
         this(new Document(document), zones);
     }
 
+    public DocumentProperties(String documentName, MultipartFile document, List<Zone> zones) throws IOException {
+        this(new Document(documentName, document), zones);
+    }
+
     public DocumentProperties(Document document, List<Zone> zones) {
-        this.id = UUID.randomUUID();;
+        this.id = UUID.randomUUID().toString();
         this.document = document;
         this.zones = zones;
     }
 
-    public UUID getId(){
+    public DocumentProperties(){
+        this.id = "";
+        this.document = new Document();
+        this.zones = new ArrayList<>();
+    }
+
+    public String getId(){
         return id;
     }
 
@@ -48,7 +55,7 @@ public class DocumentProperties {
         return document;
     }
 
-    public void setDocument(File document) throws FileNotFoundException {
+    public void setDocument(MultipartFile document) throws IOException {
         this.document = new Document(document);
     }
 
@@ -75,4 +82,10 @@ public class DocumentProperties {
     public void removeZone(Zone zone) {
         zones.remove(zone);
     }
+
+    @Override
+    public String toString() {
+        return "DocumentProperties [document=" + document + ", id=" + id + ", zones=" + zones + "]";
+    }
+
 }

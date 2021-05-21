@@ -1,12 +1,14 @@
 package com.unayshah.documentzoner.dao;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class DocumentPropertiesTest {
@@ -28,6 +31,7 @@ public class DocumentPropertiesTest {
     String folderPathname = "src/main/resources/static/";
     String incorrectFilePathname = "src/main/resources/static/IncorrectFileName.abc";
     String pdfPathname = "src/main/resources/static/testPDF.pdf";
+    String customName = "Custom Name";
     String pdfExtension = "pdf";
 
     @BeforeAll
@@ -41,35 +45,28 @@ public class DocumentPropertiesTest {
     }
 
     @Test
-    public void pathnameTest() {
-        try {
-            documentProperties = new DocumentProperties(pdfPathname);
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
+    public void emptyDocumentPropertiesConstructor() {
+        documentProperties = new DocumentProperties();
+        assertNotNull(documentProperties);
+        assertNotNull(documentProperties.getDocument());
         assertNotNull(documentProperties.getId());
+        assertNotNull(documentProperties.getZones());
+        assertEquals(documentProperties.getZones().size(), 0);
+        assertNull(documentProperties.getDocument().getFileContent());
+        assertNull(documentProperties.getDocument().getExtension());
     }
 
     @Test
     public void fileTest() {
         try {
-            documentProperties = new DocumentProperties(new File(pdfPathname));
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            documentProperties = new DocumentProperties(mockMultipartFile);
+            assertArrayEquals(documentProperties.getDocument().getFileContent(),
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+        } catch (IOException e) {
             fail();
         }
         assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
@@ -77,19 +74,37 @@ public class DocumentPropertiesTest {
     }
 
     @Test
-    public void documentTest() {
+    public void fileCustomNameTest() {
         try {
-            documentProperties = new DocumentProperties(new Document(pdfPathname));
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            documentProperties = new DocumentProperties(customName, mockMultipartFile);
+            assertArrayEquals(documentProperties.getDocument().getFileContent(),
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+        } catch (IOException e) {
             fail();
         }
+        assertEquals(documentProperties.getDocument().getDocumentName(), customName);
+        assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
+        assertNotNull(documentProperties.getId());
+    }
+
+    @Test
+    public void documentCustomNameTest() {
         try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            documentProperties = new DocumentProperties(new Document(customName, mockMultipartFile));
+            assertArrayEquals(documentProperties.getDocument().getFileContent(),
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+        } catch (IOException e) {
             fail();
         }
+        assertEquals(documentProperties.getDocument().getDocumentName(), customName);
         assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
         assertNotNull(documentProperties.getId());
     }
@@ -97,87 +112,18 @@ public class DocumentPropertiesTest {
     @Test
     public void zoneTest() {
         try {
-            documentProperties = new DocumentProperties(pdfPathname);
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            documentProperties = new DocumentProperties(new Document(customName, mockMultipartFile));
             for (int i = 0; i < zoneCount; documentProperties.addZone(zone), i++)
                 ;
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             fail();
         }
         assertEquals(documentProperties.getZones().size(), zoneCount);
         for (int i = 0; i < zoneCount; assertEquals(documentProperties.getZones().get(i), zone), i++)
             ;
-    }
-
-    @Test
-    public void pathnameZoneTest() {
-        try {
-            documentProperties = new DocumentProperties(pdfPathname);
-            for (int i = 0; i < zoneCount; documentProperties.addZone(zone), i++)
-                ;
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
-        assertNotNull(documentProperties.getId());
-        for (int i = 0; i < zoneCount; assertEquals(documentProperties.getZones().get(i), zone), i++)
-            ;
-    }
-
-    @Test
-    public void fileZoneTest() {
-        try {
-            documentProperties = new DocumentProperties(new File(pdfPathname));
-            for (int i = 0; i < zoneCount; documentProperties.addZone(zone), i++)
-                ;
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
-        assertNotNull(documentProperties.getId());
-        for (int i = 0; i < zoneCount; assertEquals(documentProperties.getZones().get(i), zone), i++)
-            ;
-    }
-
-    @Test
-    public void documentZoneTest() {
-        try {
-            documentProperties = new DocumentProperties(new Document(pdfPathname));
-            for (int i = 0; i < zoneCount; documentProperties.addZone(zone), i++)
-                ;
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        try {
-            assertEquals(documentProperties.getDocument().getDocument().getTotalSpace(),
-                    new Document(pdfPathname).getDocument().getTotalSpace());
-            assertEquals(documentProperties.getDocument().getExtension(), new Document(pdfPathname).getExtension());
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        assertEquals(documentProperties.getDocument().getExtension(), pdfExtension);
-        assertNotNull(documentProperties.getId());
-        for (int i = 0; i < zoneCount; assertEquals(documentProperties.getZones().get(i), zone), i++)
-            ;
-    }
-
-    @Test
-    public void fileNotFoundTest() {
-        assertThrows(FileNotFoundException.class, () -> {
-            documentProperties = new DocumentProperties(incorrectFilePathname);
-        });
     }
 }

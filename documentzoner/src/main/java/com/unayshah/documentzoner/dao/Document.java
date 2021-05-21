@@ -1,43 +1,79 @@
 package com.unayshah.documentzoner.dao;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public class Document {
-    private File document;
+
+    private String documentName;
+    private String actualDocumentName;
     private String extension;
+    private byte[] fileContent;
 
-    public Document(File document) throws FileNotFoundException {
-        if (!document.exists() || !document.isFile())
-            throw new FileNotFoundException();
-        this.document = document;
-        setExtension();
+    public Document(String documentName, MultipartFile document) throws IOException {
+        if (document == null || document.getSize() == 0)
+            throw new FileNotFoundException("File does not exist");
+
+        setActualDocumentName(document.getOriginalFilename());
+        this.documentName = documentName;
+        setFileContent(document);
+        setExtension(document.getName());
     }
 
-    public Document(String pathname) throws FileNotFoundException {
-        this(new File(pathname));
+    public Document(MultipartFile document) throws IOException {
+        this(document.getOriginalFilename(), document);
     }
 
-    @Override
-    public String toString() {
-        return "Document [document=" + document.toString() + ", extension=" + extension + "]";
+    public Document() {
+        this.documentName = null;
+        this.actualDocumentName = null;
+        this.fileContent = null;
+        this.extension = null;
     }
 
-    public File getDocument() {
-        return document;
+    public String getDocumentName() {
+        return documentName;
     }
 
-    public void setDocument(File document) {
-        this.document = document;
-        setExtension();
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
+
+    public String getActualDocumentName() {
+        return actualDocumentName;
+    }
+
+    private void setActualDocumentName(String actualDocumentName) {
+        this.actualDocumentName = actualDocumentName;
+    }
+
+    public void setDocument(MultipartFile document) throws IOException {
+        setFileContent(document);
+        setExtension(document.getOriginalFilename());
     }
 
     public String getExtension() {
         return extension;
     }
 
-    private void setExtension() {
-        this.extension = document.getName().split("\\.")[document.getName().split("\\.").length - 1];
+    private void setExtension(String filename) {
+        this.extension = filename.split("\\.")[filename.split("\\.").length - 1];
+    }
+
+    public byte[] getFileContent() {
+        return this.fileContent;
+    }
+
+    private void setFileContent(MultipartFile document) throws IOException {
+        this.fileContent = document.getBytes();
+    }
+
+    @Override
+    public String toString() {
+        return "Document [actualDocumentName=" + actualDocumentName + ", documentName=" + documentName + ", extension="
+                + extension + ", fileContentLength=" + fileContent.length + "]";
     }
 
 }

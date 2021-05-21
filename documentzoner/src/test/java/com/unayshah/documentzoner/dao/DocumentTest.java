@@ -1,11 +1,13 @@
 package com.unayshah.documentzoner.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class DocumentTest {
@@ -27,6 +30,8 @@ public class DocumentTest {
     String imageBMPPathname = "src/main/resources/static/testImage.bmp";
     String imageTIFPathname = "src/main/resources/static/testImage.tif";
     String pdfPathname = "src/main/resources/static/testPDF.pdf";
+    String customDocumentName = "Custom Name";
+    String customDocumentName2 = "Custom Name 2";
     String pngImageExtension = "png";
     String jpgImageExtension = "jpg";
     String bmpImageExtension = "bmp";
@@ -44,135 +49,178 @@ public class DocumentTest {
     }
 
     @Test
-    public void documentPathnameImagePNGConstructor() {
+    public void emptyDocumentConstructor() {
+        document = new Document();
+        assertNotNull(document);
+        assertNull(document.getActualDocumentName());
+        assertNull(document.getDocumentName());
+        assertNull(document.getFileContent());
+        assertNull(document.getExtension());
+    }
+
+    @Test
+    public void documentCustomNamePNGConstructor() {
         try {
-            document = new Document(imagePNGPathname);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1],
+                    imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imagePNGPathname).toPath()));
+            document = new Document(customDocumentName, mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument().getName(),
+        assertEquals(document.getDocumentName(), customDocumentName);
+        assertEquals(document.getExtension(), pngImageExtension);
+    }
+
+    @Test
+    public void documentPNGConstructor() {
+        try {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1],
+                    imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imagePNGPathname).toPath()));
+            document = new Document(mockMultipartFile);
+        } catch (IOException e) {
+            fail();
+        }
+        assertEquals(document.getDocumentName(), imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1]);
+        assertEquals(document.getActualDocumentName(),
                 imagePNGPathname.split("/")[imagePNGPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), pngImageExtension);
     }
 
     @Test
-    public void documentFileImagePNGConstructor() {
-        File file = new File(imagePNGPathname);
+    public void documentCustomNameJPGConstructor() {
         try {
-            document = new Document(file);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1],
+                    imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageJPGPathname).toPath()));
+            document = new Document(customDocumentName, mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument(), file);
-        assertEquals(document.getExtension(), pngImageExtension);
-    }
-
-    @Test
-    public void documentPathnameImageJPGConstructor() {
-        try {
-            document = new Document(imageJPGPathname);
-        } catch (FileNotFoundException e) {
-            fail();
-        }
-        assertEquals(document.getDocument().getName(),
+        assertEquals(document.getDocumentName(), customDocumentName);
+        assertEquals(document.getActualDocumentName(),
                 imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), jpgImageExtension);
     }
 
     @Test
-    public void documentFileImageJPGConstructor() {
-        File file = new File(imageJPGPathname);
+    public void documentJPGConstructor() {
         try {
-            document = new Document(file);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1],
+                    imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageJPGPathname).toPath()));
+            document = new Document(mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument(), file);
+        assertEquals(document.getDocumentName(), imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1]);
+        assertEquals(document.getActualDocumentName(),
+                imageJPGPathname.split("/")[imageJPGPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), jpgImageExtension);
     }
 
     @Test
-    public void documentPathnameImageBMPConstructor() {
+    public void documentCustomNameBMPConstructor() {
         try {
-            document = new Document(imageBMPPathname);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1],
+                    imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageBMPPathname).toPath()));
+            document = new Document(customDocumentName, mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument().getName(),
+        assertEquals(document.getDocumentName(), customDocumentName);
+        assertEquals(document.getActualDocumentName(),
                 imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), bmpImageExtension);
     }
 
     @Test
-    public void documentFileImageBMPConstructor() {
-        File file = new File(imageBMPPathname);
+    public void documentBMPConstructor() {
         try {
-            document = new Document(file);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1],
+                    imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageBMPPathname).toPath()));
+            document = new Document(mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument(), file);
+        assertEquals(document.getDocumentName(), imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1]);
+        assertEquals(document.getActualDocumentName(),
+                imageBMPPathname.split("/")[imageBMPPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), bmpImageExtension);
     }
 
     @Test
-    public void documentPathnameImageTIFConstructor() {
+    public void documentCustomNameTIFConstructor() {
         try {
-            document = new Document(imageTIFPathname);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1],
+                    imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageTIFPathname).toPath()));
+            document = new Document(customDocumentName, mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument().getName(),
+        assertEquals(document.getDocumentName(), customDocumentName);
+        assertEquals(document.getActualDocumentName(),
                 imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), tifImageExtension);
     }
 
     @Test
-    public void documentFileImageTIFConstructor() {
-        File file = new File(imageTIFPathname);
+    public void documentTIFConstructor() {
         try {
-            document = new Document(file);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1],
+                    imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(imageTIFPathname).toPath()));
+            document = new Document(mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument(), file);
+        assertEquals(document.getDocumentName(), imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1]);
+        assertEquals(document.getActualDocumentName(),
+                imageTIFPathname.split("/")[imageTIFPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), tifImageExtension);
     }
 
     @Test
-    public void documentPathnamePDFConstructor() {
+    public void documentCustomNamePDFConstructor() {
         try {
-            document = new Document(pdfPathname);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            document = new Document(customDocumentName, mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument().getName(), pdfPathname.split("/")[pdfPathname.split("/").length - 1]);
+        assertEquals(document.getDocumentName(), customDocumentName);
+        assertEquals(document.getActualDocumentName(), pdfPathname.split("/")[pdfPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), pdfExtension);
     }
 
     @Test
     public void documentFilePDFConstructor() {
-        File file = new File(pdfPathname);
         try {
-            document = new Document(file);
-        } catch (FileNotFoundException e) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1],
+                    pdfPathname.split("/")[pdfPathname.split("/").length - 1], "multipart/form-data",
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+            document = new Document(mockMultipartFile);
+        } catch (IOException e) {
             fail();
         }
-        assertEquals(document.getDocument(), file);
+        assertEquals(document.getActualDocumentName(), pdfPathname.split("/")[pdfPathname.split("/").length - 1]);
+        assertEquals(document.getDocumentName(), pdfPathname.split("/")[pdfPathname.split("/").length - 1]);
         assertEquals(document.getExtension(), pdfExtension);
-    }
-
-    @Test
-    public void folderFoundTest() {
-        assertThrows(FileNotFoundException.class, () -> {
-            document = new Document(folderPathname);
-        });
-    }
-
-    @Test
-    public void fileNotFoundTest() {
-        assertThrows(FileNotFoundException.class, () -> {
-            document = new Document(incorrectFilePathname);
-        });
     }
 }
