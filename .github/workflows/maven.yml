@@ -13,9 +13,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mongodb-version: [4.4]
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -23,11 +21,8 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.4.0
-      with:
-        mongodb-version: ${{ matrix.mongodb-version }}
+        
     - name: Test with Maven
-      run: mvn -B test --file ./documentzoner/pom.xml
+      run: mvn -B test --file pom.xml
     - name: Build with Maven
-      run: mvn -B package --file ./documentzoner/pom.xml
+      run: mvn -B package --file pom.xml
