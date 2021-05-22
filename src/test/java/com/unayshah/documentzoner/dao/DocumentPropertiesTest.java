@@ -27,7 +27,7 @@ public class DocumentPropertiesTest {
     @Mock
     Zone zone;
 
-    Integer zoneCount = new Random().nextInt(10);
+    Integer zoneCount = 1 + new Random().nextInt(10);
     String folderPathname = "src/main/resources/static/";
     String incorrectFilePathname = "src/main/resources/static/IncorrectFileName.abc";
     String pdfPathname = "src/main/resources/static/testPDF.pdf";

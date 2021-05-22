@@ -1,15 +1,22 @@
 package com.unayshah.documentzoner.dao;
 
+import java.util.UUID;
+
 public class Zone {
     private int x;
     private int y;
     private int w;
     private int h;
     private String content;
+    private String id;
 
     public Zone() {
-        x = y = w = h = 0;
-        content = String.valueOf("");
+        this(0, 0, 0, 0, "");
+    }
+
+    public Zone(Zone zone){
+        this(zone.getX(), zone.getY(), zone.getW(), zone.getH(), zone.getContent());
+        this.id = zone.getId();
     }
 
     public Zone(int x, int y, int w, int h, String content) {
@@ -18,6 +25,11 @@ public class Zone {
         this.w = w;
         this.h = h;
         this.content = content;
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public int getX() {

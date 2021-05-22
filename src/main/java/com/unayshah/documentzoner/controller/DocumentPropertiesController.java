@@ -49,9 +49,22 @@ public class DocumentPropertiesController {
         return new ResponseEntity<>(new DocumentProperties(), HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/findFileShort")
+    public ResponseEntity<DocumentProperties> findFileShort(@RequestParam(name = "id", required = true) String id) {
+        DocumentProperties documentProperties = documentPropertiesService.findFileShort(id);
+        if (documentProperties != null)
+            return new ResponseEntity<>(documentProperties, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new DocumentProperties(), HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping("/findAllFiles")
     public ResponseEntity<List<DocumentProperties>> findAllFiles() {
         return new ResponseEntity<>(documentPropertiesService.findAllFiles(), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/findAllFilesShort")
+    public ResponseEntity<List<DocumentProperties>> findAllFilesShort() {
+        return new ResponseEntity<>(documentPropertiesService.findAllFilesShort(), HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/updateFile")

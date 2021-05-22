@@ -36,6 +36,13 @@ public class DocumentPropertiesService {
         return null;
     }
 
+    public DocumentProperties findFileShort(String id) {
+        Optional<DocumentProperties> result = documentPropertiesRepository.findByIdShort(id);
+        if (result.isPresent())
+            return result.get();
+        return null;
+    }
+
     public DocumentProperties updateFile(DocumentProperties documentProperties) throws IOException {
         return saveFile(documentProperties);
     }
@@ -50,6 +57,10 @@ public class DocumentPropertiesService {
 
     public List<DocumentProperties> findAllFiles() {
         return documentPropertiesRepository.findAll();
+    }
+
+    public List<DocumentProperties> findAllFilesShort() {
+        return documentPropertiesRepository.findAllShort();
     }
 
     public boolean deleteAllFiles() {
