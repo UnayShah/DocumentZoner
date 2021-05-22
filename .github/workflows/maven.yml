@@ -23,6 +23,6 @@ jobs:
         distribution: 'adopt'
         
     - name: Test with Maven
-      run: mvn -B test --file pom.xml -Dprod
+      run: mvn -B test --file pom.xml -Pprod
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Dprod
+      run: mvn -B package --file pom.xml -Pprod
