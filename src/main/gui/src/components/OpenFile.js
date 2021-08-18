@@ -35,6 +35,17 @@ class OpenFile extends Component {
             this.setState(prevState => ({ pageNumber: (prevState.pageNumber) - 1 }));
     }
 
+    removeTextLayerOffset = () => {
+        const textLayers = document.querySelectorAll(".react-pdf__Page__textContent");
+        textLayers.forEach(layer => {
+            const { style } = layer;
+            style.top = "0";
+            style.left = "0";
+            style.transform = "";
+        });
+        console.log(textLayers);
+    }
+
     render() {
 
         if (this.state.loading) {
@@ -43,6 +54,7 @@ class OpenFile extends Component {
 
         const fileContent = this.state.file.document.fileContent;
         const { numPages, pageNumber } = this.state;
+        const removeTextLayer = this.removeTextLayerOffset();
         if (!this.state.file.document.actualDocumentName.toLowerCase().endsWith('.pdf')) {
             const Image = ({ fileContent }) => <img src={`data:image/jpeg;base64,${fileContent}`} />
             console.log('image')
@@ -57,7 +69,7 @@ class OpenFile extends Component {
                 <div>
                     <Document file={`data:application/pdf;base64,${fileContent}`}
                         onLoadSuccess={this.onLoadSuccess}>
-                        <Page pageNumber={pageNumber} />
+                        <Page pageNumber={pageNumber} onLoadSuccess={removeTextLayer}/>
                     </Document >
                     <div>
                         <Button variant='outlined' color='primary' onClick={this.previous}>Previous</Button>

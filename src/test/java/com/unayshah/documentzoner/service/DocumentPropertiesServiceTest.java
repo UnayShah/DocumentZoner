@@ -51,11 +51,11 @@ public class DocumentPropertiesServiceTest {
         System.err.println("Document Properties Service test completed");
     }
 
-    @Test
-    @Order(0)
-    public void deleteAllBefore() {
-        documentPropertiesService.deleteAllFiles();
-    }
+    // @Test
+    // @Order(0)
+    // public void deleteAllBefore() {
+    //     documentPropertiesService.deleteAllFiles();
+    // }
 
     @Test
     @Order(1)
@@ -113,11 +113,16 @@ public class DocumentPropertiesServiceTest {
                     Files.readAllBytes(new File(pdfPathname).toPath()));
         });
         assertTrue(documentPropertiesService.deleteFile(id1));
+        assertDoesNotThrow(() -> {
+            assertArrayEquals(documentPropertiesService.findFile(id2).getDocument().getFileContent(),
+                    Files.readAllBytes(new File(pdfPathname).toPath()));
+        });
+        assertTrue(documentPropertiesService.deleteFile(id2));
     }
 
-    @Test
-    @Order(6)
-    public void deleteAllAfter() {
-        documentPropertiesService.deleteAllFiles();
-    }
+    // @Test
+    // @Order(6)
+    // public void deleteAllAfter() {
+    //     documentPropertiesService.deleteAllFiles();
+    // }
 }

@@ -74,6 +74,7 @@ public class DocumentPropertiesRepositoryTest {
             fail();
         }
         assertTrue(documentPropertiesRepository.save(documentProperties).equals(documentProperties));
+        documentPropertiesRepository.deleteById(id);
     }
 
     @Test
@@ -172,13 +173,12 @@ public class DocumentPropertiesRepositoryTest {
 
     }
 
-    @Test
-    @Order(6)
-    public void deleteAllDocumentProperties() {
-        assertNotEquals(documentPropertiesRepository.findAll().size(), 0);
-        documentPropertiesRepository.deleteAll();
-        assertEquals(documentPropertiesRepository.findAll().size(), 0);
-
-    }
+    // @Test
+    // @Order(6)
+    // public void deleteAllDocumentProperties() {
+    //     assertNotEquals(documentPropertiesRepository.findAll().size(), 0);
+    //     documentPropertiesRepository.deleteAll();
+    //     assertEquals(documentPropertiesRepository.findAll().size(), 0);
+    // }
 
 }

@@ -14,3 +14,12 @@ export async function saveFile(data) {
     });
     return response.json();
 }
+
+export async function deleteFile(id){
+    const response = await fetch(rootURL + '/deleteFile', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({id:id})
+    });
+    return response.json();
+}

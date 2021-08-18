@@ -1,34 +1,49 @@
 import React, { Component } from 'react';
-import { getAllFiles, saveFile } from "./AppService";
 import FileDetails from "./FileDetails";
 import Paper from '@material-ui/core/Paper';
-import { Table, TableHead, TableContainer, makeStyles } from '@material-ui/core';
-import Toolbar from "@material-ui/core/Toolbar";
-import AppBar from "@material-ui/core/AppBar";
-import IconButton from "@material-ui/core/IconButton"
+import { Table, TableHead, TableContainer, TableRow, TableCell, TableBody, withStyles, Toolbar, AppBar, IconButton, Button } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
+import { Add } from "@material-ui/icons";
+import FileService from '../service/FileService';
+import AddFileDialog from './AddFileDialog';
+
+const useStyles = theme => ({
+    root: {
+        '& > *': {
+            margin: theme.spacing(1),
+        },
+    },
+    input: {
+        display: 'none',
+    },
+});
 
 class Home extends Component {
     state = {
         fileList: [],
         loading: true,
-        classes: ''
     };
 
-    getAllFiles = () => {
-        getAllFiles().then(files => {
-            // console.log(files)
-            this.setState({ fileList: files, loading: false })
-        });
-    }
-    componentDidMount() {
-        // getAllFiles();
-        fetch('/findAllFilesShort').then(res => res.json()).then(json => {
+    findAllFilesShort() {
+        FileService.findAllFilesShort().then(response => response.json()).then(json => {
             this.setState({ fileList: json, loading: false });
         });
     }
 
+    deleteFile(id) {
+        FileService.deleteFile(id).then(response => response.json()).then(json => {
+            console.log('Deleted file with id: ' + id);
+            console.log('Response: ' + json);
+            this.findAllFilesShort();
+        })
+    }
+
+    componentDidMount() {
+        this.findAllFilesShort();
+    }
+
     render() {
+        const { classes } = this.props;
         if (this.state.loading) {
             return <p>Loading</p>
         }
@@ -38,12 +53,22 @@ class Home extends Component {
                     <IconButton edge="start" color="inherit" aria-label="menu">
                         <MenuIcon />
                     </IconButton>
+                    <AddFileDialog />
                 </Toolbar>
                 <div>
 
                     <TableContainer component={Paper}>
                         <Table>
-                            {this.state.fileList.map((file) => <FileDetails key={file.id} file={file} />)}
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Id</TableCell>
+                                    <TableCell>File Name</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {this.state.fileList.map((file) => <FileDetails key={file.id} file={file} deleteFile={this.deleteFile.bind(this)} />)}
+                            </TableBody>
                         </Table>
                     </TableContainer>
                 </div>
@@ -51,4 +76,4 @@ class Home extends Component {
         );
     }
 }
-export default Home
+export default withStyles(useStyles)(Home);
